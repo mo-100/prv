@@ -1,9 +1,9 @@
 // Package activity computes LastActive per the spec section "Activity":
 //
-//   - Git repos — no walk. LastActive = max(last commit time, newest mtime
+//   - Git repos - no walk. LastActive = max(last commit time, newest mtime
 //     among dirty/untracked paths from the porcelain State the git package
 //     already collected).
-//   - Non-git folders — bounded walk honouring fsutil.SkipDirs, depth cap ~10.
+//   - Non-git folders - bounded walk honouring fsutil.SkipDirs, depth cap ~10.
 //     The walk never descends into symlinked directories.
 package activity
 
@@ -32,7 +32,7 @@ func ForGit(dir string, st *git.State) time.Time {
 	for _, p := range st.DirtyPaths {
 		fi, err := os.Stat(filepath.Join(dir, p))
 		if err != nil {
-			continue // path deleted or unreadable since porcelain — skip
+			continue // path deleted or unreadable since porcelain - skip
 		}
 		if fi.ModTime().After(latest) {
 			latest = fi.ModTime()

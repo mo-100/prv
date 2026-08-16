@@ -1,6 +1,5 @@
 # Built binary
-out/prv
-out/prv.exe
+out/*
 
 # Go workspace files
 /go.work

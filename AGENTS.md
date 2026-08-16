@@ -10,6 +10,6 @@
 
 5. I'm always open to ideas on better ways to do things. Please don't hesitate to suggest a better way, or one that has long lasting impact over a tactical change. (as a few examples)
 
-6. One fact, one home. Knowledge reused in more than one place — a constant, a format, a validation rule, a list of valid values — must live in a single shared definition that every consumer reads from; duplicating it means you're maintaining two copies that will drift apart, which is a bug, not a convenience.
+6. Don't hardcode or duplicate shared values across modules. Define them once in a shared module that every consumer imports. If a value is hardcoded anyway, add a comment telling the reader: "any change here must also be made in file X / module Y."
 
-7. Treat existing tests as load-bearing. Don't edit or delete a test case unless I confirm it; when you add a new feature, add tests for it. Prioritise the conflicting scenarios — the edge cases where the code could behave incorrectly — and make sure the behaviour you're encoding is actually intended, not just what happens to pass.
+7. Never modify or delete a test without my approval. Add tests for each new feature, prioritize edge cases where the code could behave incorrectly. Confirm the behavior you encode is intended, not just what happens to pass

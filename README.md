@@ -1,31 +1,25 @@
-# 🗂️ prv — projects directory viewer
+# prv
 
-> **See the live state of everything in a folder — git or not — at a glance.**
+The live state of everything in a folder - git or not.
 
-`prv` scans a directory of projects and renders each one as a single, classified row: git
-status, open todos, detected ecosystem tags, and last activity. It's read-only and
-stateless — it inspects real disk every run and never writes a thing.
+## Key features
 
-## 🌟 Highlights
-
-- **Not just git repos.** A write-up, a `notes/` folder, a half-started project that's
-  never been `git init`'d — they all still belong in the view.
-- **Two frontends, one engine.** A full-screen TUI (`prv`) and a scriptable CLI table
-  (`prv ls`) share the same scanner — no duplicated logic.
+- **Git or not.** Every project is shown - git repos and never-`git init`'d folders alike.
+- **Read-only & stateless.** No registry, no cache, no config file - inspects real disk every run.
 - **Ecosystem tags.** Manifests (`go.mod`, `package.json`, `pyproject.toml`, …) become
   readable `go` / `node` / `python` tags.
-- **TODO awareness.** Detects `TODO` / `TODO.md` / `TODO.txt` and shows how many items
-  are still open.
-- **Strictly read-only & stateless.** No registry, no cache, no config file. `git fetch`
-  is the only network op — and it's opt-in.
+- **Single static binary.** One file, no runtime dependencies, cross-platform (Windows, macOS, Linux).
+- **Git features.** Branch, dirty/clean state, and ahead/behind counts - from local tracking
+  refs unless you opt in to `git fetch`.
+- **TODO features.** Detects `TODO` / `TODO.md` / `TODO.txt` and shows open items.
 
-## ℹ️ Overview
+## Overview
 
 `prv` answers one question: **what's the state of everything in this folder right now?**
 Run it and get a table of every project with its git branch and dirty/behind state, open
 todos, detected stack, and when it was last touched.
 
-It's built for the folder of many projects — `~/work`, `~/personal`, a monorepo boundary —
+It's built for the folder of many projects - `~/work`, `~/personal`, a monorepo boundary -
 where you want a live inventory rather than a deep dive into a single repo. Because it's a
 *projects directory* viewer (not a git-only multi-repo scanner), non-git projects are
 first-class citizens: any directory with a signal (`.git`, a manifest, a TODO file, or an
@@ -35,7 +29,7 @@ are expanded into their children.
 The whole thing is one static Go binary. It launches instantly, reads real disk fresh
 every scan, and never tells you anything it cached.
 
-## 🚀 Usage
+## Usage
 
 Run the full-screen TUI on the current directory:
 
@@ -53,10 +47,10 @@ prv ls .. --depth=3 # table, shallower scan
 
 Example table output:
 
-```
+```text
 my-app       node   ●2   main    ↑2   3    2d ago
 legacy-svc   python ✓    dev         ✓    21d ago
-proto        go     ●1   feat/x  ↓1   —    5h ago
+proto        go     ●1   feat/x  ↓1   -    5h ago
 ```
 
 ### TUI keys
@@ -83,14 +77,15 @@ visually distinguished (e.g. a `?` suffix) so old data never masquerades as fres
 | `--fetch` | Fetch tracking refs before rendering (network) |
 | `--refresh=<duration>` | TUI auto-rescan cadence, e.g. `--refresh=30s` (off by default) |
 | `--sort=<field>` | Sort field: `name` \| `activity` \| `todo` \| `tags` \| `git` |
+| `--version` | Print the version and exit |
 
-## ⬇️ Installation
+## Installation
 
-`prv` is a single static Go binary — no runtime dependencies.
+`prv` is a single static Go binary - no runtime dependencies.
 
 **Requirements:**
 
-- Go **1.26** or newer. (build-time only — the installed binary has no Go runtime dependency)
+- Go **1.26** or newer. (build-time only - the installed binary has no Go runtime dependency)
 - git available on $PATH (used as a subprocess for all git state)
 
 If Go is installed, the one-liner is:
@@ -105,12 +100,15 @@ Or build from a checkout:
 go build -o out/prv ./cmd/prv
 ```
 
-> **`go install` puts the binary in `$GOPATH/bin` (or `$HOME/go/bin` by default).** If `prv: command not found` after installing, that directory likely isn't on your `$PATH` — see [Troubleshooting](#-troubleshooting).
+After installing, verify the binary is on your `$PATH` and works:
 
-> Looking to *contribute*? Head to [Contributing](#-contributing) — the install line above
-> is for users.
+```bash
+prv --version
+```
 
-## 🎯 How it decides what's a project
+> **`go install` puts the binary in `$GOPATH/bin` (or `$HOME/go/bin` by default).** If `prv: command not found` after installing, that directory likely isn't on your `$PATH` - see [Troubleshooting](#troubleshooting).
+
+## How it decides what's a project
 
 Every directory with a **project signal** becomes a row:
 
@@ -122,9 +120,9 @@ Every directory with a **project signal** becomes a row:
 Dirs with *no signals of their own* but signalled children are treated as **containers**
 and expanded into their children (up to `--depth`). Signal-less folders with no signalled
 children, hidden dirs, and skip-listed paths (`node_modules`, `dist`, `build`, …) are
-quietly omitted — no noise.
+quietly omitted - no noise.
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 **`prv: command not found` after `go install`**
 `go install` places the binary in `$GOPATH/bin` (defaults to `$HOME/go/bin`). Add it to
@@ -136,15 +134,9 @@ That project's `.git` directory exists but `git -C <path>` failed to read its st
 underlying error.
 
 **`↑N` / `↓N` shows a trailing `?`**
-That means the ahead/behind count is from local tracking refs only — no fetch has run this
+That means the ahead/behind count is from local tracking refs only - no fetch has run this
 session, so it may be stale. Run with `--fetch` or press `f` in the TUI to refresh it.
 
-## 🤝 Contributing
-
-This is a small, opinionated tool and the bar for a new feature is: *does it fit the identity?* Before opening a PR, keep the tools vision in mind.
-
-Bugs and feature ideas are welcome. Open an issue to discuss scope first.
-
-## 📄 License
+## License
 
 MIT

@@ -4,7 +4,7 @@
 // todolist and activity are all produced by the engine packages; this package
 // renders them and drives keyboard interaction. Sorting reuses render.Sort so
 // `prv ls` and the TUI never drift apart; the column set, per-cell plain-text
-// rules, and sort field set all live in internal/render — this package only
+// rules, and sort field set all live in internal/render - this package only
 // adds lipgloss styling.
 package tui
 
@@ -56,8 +56,7 @@ const (
 )
 
 // The staleness threshold (render.StaleDays) and the inter-cell gap
-// (render.ColGap) live in internal/render — the single homes shared with
-// `prv ls` — so this package reaches them there instead of restating them.
+// (render.ColGap) live in internal/render - so this package reaches them there instead of restating them.
 
 // --- messages --------------------------------------------------------------
 
@@ -490,7 +489,7 @@ func (m *model) renderTable(avail int) string {
 	// Column widths come from the header labels PLUS every row in the full
 	// filtered view (m.view), not just the visible window. Computing widths
 	// over the visible window alone made a column shrink whenever the row
-	// carrying its longest cell scrolled out of view — the "big project name
+	// carrying its longest cell scrolled out of view - the "big project name
 	// disappears, janky ui" jitter. Sizing from the full view keeps columns
 	// stable across scroll position; the body below still emits only the
 	// visible rows. Cost is O(N·cols) per render instead of O(W·cols), fine

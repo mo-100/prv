@@ -1,8 +1,8 @@
 // Package render is the single source of truth for the project table's
 // column schema, the plain-text formatting of each cell, and the sortable
-// field set. Both frontends — the pipe-friendly `prv ls` table
+// field set. Both frontends - the pipe-friendly `prv ls` table
 // (internal/report, which adds width-aware padding) and the lipgloss-styled
-// TUI (internal/tui, which adds color) — build their headers and rows from
+// TUI (internal/tui, which adds color) - build their headers and rows from
 // here, and both sort through here. Adding a column or a sort field is one
 // edit to this package; no frontend re-states the set.
 //
@@ -56,16 +56,14 @@ var Columns = []Column{
 }
 
 // StaleDays is the locked staleness threshold (in days): a project whose
-// LastActive is older than this is "stale". It is the single home for the
-// threshold — the TUI's `stale()` predicate reads it, and any future `prv ls`
+// LastActive is older than this is "stale". the TUI's `stale()` predicate reads it, and any future `prv ls`
 // column / fetch-aware grace reads it too, so both frontends agree on one
-// definition (AGENTS.md #6). Kept here (not in internal/tui) because it is a
+// definition Kept here (not in internal/tui) because it is a
 // shared output-time fact, not a TUI-only presentation detail.
 const StaleDays = 30
 
 // ColGap is the inter-cell separator both frontends place between columns of
-// a rendered row ("  ", two spaces). It is the single home for the gap so
-// internal/report and internal/tui never drift on column spacing; change it
+// a rendered row ("  ", two spaces). change it
 // once here and both frontends pick it up.
 const ColGap = "  "
 
@@ -94,7 +92,7 @@ func TUIHeaders() []string {
 // via styleCell. No ANSI lives here.
 
 // Name renders the project name with a trailing "!" error marker when the
-// per-project scan failed (corrupt .git, permissions, etc.) — per spec
+// per-project scan failed (corrupt .git, permissions, etc.) - per spec
 // line 130.
 func Name(name string, err error) string {
 	if err != nil {
@@ -275,7 +273,7 @@ func SortCycle() []string {
 }
 
 // DefaultSort is the locked default sort field — the first entry of the sort
-// cycle (sortable[0], "name"). It is the single home for the `--sort` default:
+// cycle (sortable[0], "name").
 // main's flag default and the usage/README field list read from here /
 // SortCycle, never a hand-typed "name". Changing the default is one edit to
 // the sortable order.

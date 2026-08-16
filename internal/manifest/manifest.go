@@ -30,7 +30,7 @@ import (
 // never suppresses one at depth 2 (the union is taken across all levels).
 // This makes the search uniform for `.prv`-marked and unmarked projects alike.
 //
-// Cheap — no subprocess, no file contents; entry-name checks only. The shared
+// Cheap - no subprocess, no file contents; entry-name checks only. The shared
 // skip list (node_modules, .git, build, …) and hidden directories are pruned
 // during recursion so dependency/vendored trees never inject false tags and
 // the walk stays bounded. A read failure yields no tags from that branch.

@@ -28,7 +28,7 @@ func asModel(t *testing.T, m tea.Model) *model {
 // panicking on an empty row set and shows the centered "no projects" message.
 func TestEmptyStateAndView(t *testing.T) {
 	m := asModel(t, New(".", scan.NewConfig(), 0, nil))
-	m.Init() // set up commands; we ignore them — no loadedMsg processed.
+	m.Init() // set up commands; we ignore them - no loadedMsg processed.
 
 	view := m.View()
 	if view == "" {
@@ -112,7 +112,7 @@ func TestStatusLineFreshness(t *testing.T) {
 
 // TestHeaderDistinctFromStatus is a regression guard: renderTitle() returns
 // "titleLine\nstatusLine" with NO trailing newline, so View() must insert a
-// delimiter before the table body — otherwise the header row concatenates onto
+// delimiter before the table body - otherwise the header row concatenates onto
 // the status line and the header vanishes (pushed off the right edge) whenever
 // m.status is non-empty, which is always in the real app after a scan.
 func TestHeaderDistinctFromStatus(t *testing.T) {
@@ -467,7 +467,7 @@ func TestRenderStableWidthsOnScroll(t *testing.T) {
 			widthLongOffScreen, widthLongOnScreen)
 	}
 	// The width must be driven by the long row even when that row is scrolled
-	// off-screen — i.e. not the header-only width (len("Name")==4).
+	// off-screen - i.e. not the header-only width (len("Name")==4).
 	if widthLongOffScreen != len(long) {
 		t.Errorf("Name width when long row off-screen=%d, want %d (len of long name); "+
 			"widths not computed over the full filtered view", widthLongOffScreen, len(long))

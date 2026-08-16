@@ -3,12 +3,10 @@
 //
 // [IsTODOName] is the single source of truth for which filenames count as a
 // TODO file; project.isSignalName delegates to it so project detection and
-// the TODO render never disagree on what a TODO file is (AGENTS.md #6: one
-// fact, one home). Add an extension there, not anywhere else.
+// the TODO render never disagree on what a TODO file is. Add an extension there, not anywhere else.
 //
 // The parser is isolated behind the [Source] interface so additional TODO
-// origins can be plugged in later — AGENTS.md / CLAUDE.md checklist sections,
-// `grep TODO` comments, or GitHub issues — without the scanner knowing about
+// origins can be plugged in later, `grep TODO` comments, or GitHub issues - without the scanner knowing about
 // each origin. Today the only implementation is [fileSource], the TODO file
 // parser; no other source is added yet.
 package todolist
@@ -37,9 +35,9 @@ type Source interface {
 // subdirectories; and so on), and how many open (- [ ]) items it has. The
 // first match wins, deterministically: dir itself is checked first, then
 // subdirectory names are sorted and searched depth-first. Filenames are
-// matched case-insensitively via [IsTODOName] — the single source of truth
+// matched case-insensitively via [IsTODOName] - the single source of truth
 // shared with project detection; all accepted names use one parser. Hidden and
-// skip-listed subdirectories (fsutil.IsHidden / fsutil.IsSkipDir — the same
+// skip-listed subdirectories (fsutil.IsHidden / fsutil.IsSkipDir - the same
 // pruning tag detection uses) are never descended into, so a TODO.md inside
 // node_modules/.vscode cannot inject a false signal. A TODO
 // file with no checkbox lines still reports present=true, open=0. A read error is
@@ -74,7 +72,7 @@ func (fileSource) Scan(dir string, depth int) (present bool, open int, err error
 // todoNames are the accepted file basenames, matched case-insensitively. This
 // is the single source of truth for "what is a TODO file": project.isSignalName
 // delegates to [IsTODOName] so project detection and the TODO render agree.
-// Bare "todo" is included — a TODO file with no extension is a documented
+// Bare "todo" is included - a TODO file with no extension is a documented
 // project signal (see README). Add an extension only here.
 var todoNames = []string{"todo", "todo.md", "todo.txt"}
 

@@ -54,7 +54,7 @@ type Entry struct {
 }
 
 // Catalog is the single source of truth for the manifest→tag mapping, in the
-// deterministic report order. Append here to add an ecosystem — project
+// deterministic report order. Append here to add an ecosystem - project
 // detection ("does this folder carry a manifest?") and tag detection ("which
 // ecosystem tags fire?") both read this one list, so adding a manifest is a
 // single edit rather than a sync of two lists. A manifest name also classifies
@@ -98,7 +98,7 @@ func isSignalName(name string) bool {
 	}
 	// TODO file: bare TODO, TODO.md, TODO.txt. todolist.IsTODOName is the
 	// single source of truth for which filenames count, so project detection
-	// and the TODO render never disagree (AGENTS.md #6).
+	// and the TODO render never disagree.
 	if todolist.IsTODOName(name) {
 		return true
 	}
@@ -106,7 +106,7 @@ func isSignalName(name string) bool {
 }
 
 // HasSignal reports whether the directory at path contains any project signal
-// (file-existence only — no subprocess). A read failure reports false; the
+// (file-existence only - no subprocess). A read failure reports false; the
 // scanner records the error on the row.
 func HasSignal(path string) bool {
 	entries, err := os.ReadDir(path)

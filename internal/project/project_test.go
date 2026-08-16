@@ -7,7 +7,7 @@ import (
 )
 
 // The catalog collapse made Dockerfile and docker-compose.yml first-class
-// project signals (not just tag sources). These guard that contract — a
+// project signals (not just tag sources). These guard that contract - a
 // folder carrying only one of them classifies as a project where it
 // previously did not. If the catalog ever drops one, these catch it.
 func TestHasSignalDockerManifests(t *testing.T) {
@@ -44,7 +44,7 @@ func TestIsManifest(t *testing.T) {
 // todolist.IsTODOName (the single source of truth), so detection and the TODO
 // render can never disagree. Bare TODO is a documented signal; TODO.org and
 // other TODO.* are not (the old isSignalName prefix over-accepted them while
-// the render ignored them — a live bug).
+// the render ignored them - a live bug).
 func TestHasSignalTODOFiles(t *testing.T) {
 	yes := []string{"TODO", "TODO.md", "TODO.txt", "Todo.md", "todo.TXT"}
 	for _, name := range yes {

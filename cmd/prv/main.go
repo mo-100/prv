@@ -7,17 +7,19 @@
 //	prv <path>       → TUI on <path>
 //	prv ls           → table on . to stdout
 //	prv ls <path>    → table on <path> to stdout
+//	prv --version    → print version and exit
 //
 // When prv (TUI) is invoked with stdout not a TTY, fall back to ls output.
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"os"
 	"strings"
 	"time"
+
+	flag "github.com/spf13/pflag"
 
 	tea "github.com/charmbracelet/bubbletea"
 
@@ -28,9 +30,16 @@ import (
 	"github.com/mo-100/prv/internal/tui"
 )
 
+// version is the prv release version. Set at build time from git, e.g.:
+//
+//	go build -ldflags "-X main.version=$(git describe --tags --always)" ./cmd/prv
+//
+// "dev" is the default for uncommitted/local builds.
+var version = "dev"
+
 // usage is the flag/usage banner. Its default values and the sort field list
-// are sourced from the one-home defaults (scan.DefaultDepth, render.SortCycle)
-// so the help text can never drift from the code defaults — no hand-typed "4"
+// are sourced from the defaults (scan.DefaultDepth, render.SortCycle)
+// so the help text can never drift from the code defaults - no hand-typed "4"
 // or sort list here.
 var usage = fmt.Sprintf(`prv — projects directory viewer (read-only)
 
@@ -43,6 +52,7 @@ Flags:
   --fetch                fetch tracking refs before rendering (network)
   --refresh=<duration>   TUI auto-rescan cadence (e.g. --refresh=30s)
   --sort=<field>         sort field (ls): %s
+  --version              print version and exit
 `, scan.DefaultDepth, strings.Join(render.SortCycle(), " | "))
 
 type options struct {
@@ -74,6 +84,8 @@ func run(args []string, stdout io.Writer, stderr io.Writer) error {
 	)
 	fs.SetOutput(stderr)
 	fs.Usage = func() { fmt.Fprint(stderr, usage) }
+	var showVersion bool
+	fs.BoolVar(&showVersion, "version", false, "print version and exit")
 	fs.BoolVar(&opts.fetch, "fetch", false, "fetch tracking refs (network)")
 	fs.DurationVar(&opts.refresh, "refresh", 0, "TUI auto-rescan cadence")
 	fs.StringVar(&sortFlag, "sort", render.DefaultSort(), "sort field ("+strings.Join(render.SortCycle(), "|")+")")
@@ -81,6 +93,10 @@ func run(args []string, stdout io.Writer, stderr io.Writer) error {
 	fs.IntVar(&depth, "depth", scan.DefaultDepth, "root-relative classification + manifest/TODO search depth")
 	if err := fs.Parse(rest); err != nil {
 		return err
+	}
+	if showVersion {
+		fmt.Fprintf(stdout, "prv %s\n", version)
+		return nil
 	}
 	if fs.Lookup("refresh").Value.String() != "0s" {
 		opts.refreshSet = true

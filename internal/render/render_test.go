@@ -250,9 +250,6 @@ func TestValidSortAndCycle(t *testing.T) {
 	}
 }
 
-// TestDefaultSortIsCycleHead pins the one-home guarantee: the --sort default
-// is the first entry of the sort cycle, not an independent literal. If this
-// drifts, main's flag default and the TUI `s` cycle disagree on the default.
 func TestDefaultSortIsCycleHead(t *testing.T) {
 	cycle := SortCycle()
 	if len(cycle) == 0 {

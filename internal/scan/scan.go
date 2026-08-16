@@ -30,9 +30,6 @@ import (
 // DefaultDepth is the locked default root-relative depth (4 = the sum of the
 // former classification and search defaults, 2+2). One --depth flag budgets
 // both classification (container expansion) and per-row manifest/TODO search.
-// It is the single home for the --depth default: NewConfig, the zero-value
-// normalizer, and main's flag default all read it (AGENTS.md #6 — one fact,
-// one home).
 const DefaultDepth = 4
 
 // Config tunes the scanner. Build it with NewConfig to get the locked defaults;
@@ -49,8 +46,7 @@ type Config struct {
 	Depth int
 }
 
-// NewConfig returns the default Config: Depth from DefaultDepth (the single
-// home for the --depth default). Both frontends build their scan config
+// NewConfig returns the default Config: Depth from DefaultDepth. Both frontends build their scan config
 // through here or set the zero value, which normalizes to the same default.
 func NewConfig() Config {
 	return Config{Depth: DefaultDepth}
@@ -154,7 +150,7 @@ func (s *scanner) collect(dir, relPrefix string, childDepth int, entries []entry
 				grandkids, gerr := dirEntries(c.abs)
 				s.collect(c.abs, relName, childDepth+1, grandkids, gerr)
 			}
-			// At the depth cap the container produces no row — its signalled
+			// At the depth cap the container produces no row - its signalled
 			// children are too deep to surface, and an empty placeholder adds
 			// no value.
 		}
@@ -257,7 +253,7 @@ func hasSignalledChild(dir string) bool {
 // is the row's root-depth (project.Depth). A root child (k=1) searches to the
 // full config depth; rows deeper in the tree get a proportionally smaller
 // budget, so the deepest contributing manifest/TODO always sits at
-// root-depth ≤ depth. Uniform search is intentionally relaxed — search scope
+// root-depth ≤ depth. Uniform search is intentionally relaxed - search scope
 // depends on the row's depth (user-confirmed when the two depth flags merged).
 func rowBudget(depth, k int) int {
 	if b := depth - k + 1; b > 1 {

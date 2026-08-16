@@ -238,7 +238,7 @@ func TestScanParseErrorPropagates(t *testing.T) {
 
 // TestScanBareTODO locks the contract that a bare `TODO` (no extension) is a
 // recognized TODO file. It used to classify as a project signal via
-// project.isSignalName but never rendered (todoNames lacked it) — detection
+// project.isSignalName but never rendered (todoNames lacked it) - detection
 // and render disagreed. Now both stem from IsTODOName.
 func TestScanBareTODO(t *testing.T) {
 	dir := t.TempDir()

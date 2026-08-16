@@ -1,8 +1,8 @@
 // Package fsutil holds the filesystem-name predicates shared by the scanner
 // and its engines: which names count as hidden, and which directories are
-// never descended into. It is neutral ground — every engine package (project,
+// never descended into. It is neutral ground - every engine package (project,
 // scan, manifest, activity, todolist) imports this instead of importing each
-// other, so the package graph stays acyclic. One fact, one home (AGENTS.md #6).
+// other, so the package graph stays acyclic.
 package fsutil
 
 import "strings"
@@ -25,7 +25,7 @@ var SkipDirs = map[string]bool{
 
 // IsHidden reports whether name begins with "." (POSIX-hidden, Windows junction
 // paths included). A hidden name is never shown and never expanded or descended
-// into, and a project signal (e.g. `.prv`) does NOT override hidden/skip —
+// into, and a project signal (e.g. `.prv`) does NOT override hidden/skip -
 // hidden/skip is checked before signals, so a signal inside a hidden dir never
 // surfaces it.
 func IsHidden(name string) bool { return strings.HasPrefix(name, ".") }

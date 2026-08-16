@@ -66,7 +66,7 @@ func TestRunSeedRollupAtDefaultDepth(t *testing.T) {
 }
 
 // TestRunSeedAtDepth1: with a depth of 1 the seed row's manifest/TODO budget is
-// max(1,1-1+1)=1, so only the row's own directory is searched — the nested
+// max(1,1-1+1)=1, so only the row's own directory is searched - the nested
 // node manifest at row-depth 2 is beyond budget and contributes no tag.
 func TestRunSeedAtDepth1(t *testing.T) {
 	root := t.TempDir()
@@ -88,7 +88,7 @@ func TestRunSeedAtDepth1(t *testing.T) {
 }
 
 // TestRunContainerChildrenNoRollup: two sibling projects under a container each
-// keep their own tags (per-row isolation) — no `work` container row, no row
+// keep their own tags (per-row isolation) - no `work` container row, no row
 // carrying both tags.
 func TestRunContainerChildrenNoRollup(t *testing.T) {
 	root := t.TempDir()
@@ -121,7 +121,7 @@ func TestRunContainerChildrenNoRollup(t *testing.T) {
 
 // TestRunRootWithOwnSignalSingleRow: a root with its own signal is a single
 // project row (k=1) whose tag search rolls up child manifests across depths
-// into one row — the regression that a child manifest suppresses the root.
+// into one row - the regression that a child manifest suppresses the root.
 func TestRunRootWithOwnSignalSingleRow(t *testing.T) {
 	root := t.TempDir()
 	write(t, filepath.Join(root, "go.mod"), "module root")
@@ -144,7 +144,7 @@ func TestRunRootWithOwnSignalSingleRow(t *testing.T) {
 	}
 }
 
-// TestRunHiddenDirWithSignalNotShown: hidden/skip wins over signals — a hidden
+// TestRunHiddenDirWithSignalNotShown: hidden/skip wins over signals - a hidden
 // dir carrying a project signal is never a row, and a container whose only
 // signalled child is a skip-listed dir does not surface either.
 func TestRunHiddenDirWithSignalNotShown(t *testing.T) {
