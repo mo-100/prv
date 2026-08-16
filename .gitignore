@@ -1,0 +1,7 @@
+# Built binary
+prv
+prv.exe
+
+# Go workspace files
+/go.work
+/go.work.sum
