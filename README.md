@@ -1,5 +1,12 @@
 # prv
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/prv-lockup-dark.svg">
+    <img src="assets/prv-lockup.svg" alt="prv" width="320">
+  </picture>
+</p>
+
 The live state of everything in a folder - git or not.
 
 ## Key features

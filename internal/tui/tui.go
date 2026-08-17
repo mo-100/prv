@@ -336,27 +336,33 @@ func gitStateWord(p *project.Project) string {
 
 // --- palette & styles ------------------------------------------------------
 
+// Palette — brand dark-terminal palette. One accent: clean
+// state, ecosystem tags, and selection share colorAccent (success == accent);
+// warn and danger are separate roles; colorDim marks stale rows (>30d).
 var (
-	colorAccent = lipgloss.Color("#7aa2f7") // selection / header / branch accent
-	colorDirty  = lipgloss.Color("#ff7a93") // dirty / error accent
-	colorClean  = lipgloss.Color("#9ece6a") // clean repos
-	colorMuted  = lipgloss.Color("#6c7086") // non-git / clean-text / stale
-	colorNormal = lipgloss.Color("#c0caf5") // default name text
-	colorBar    = lipgloss.Color("#1f2335") // selection background
+	colorFg      = lipgloss.Color("#d4d7da") // primary text
+	colorMuted   = lipgloss.Color("#8b9196") // non-git, no upstream, empty values
+	colorAccent  = lipgloss.Color("#5cc97a") // clean, tags, selection/header/branch accent
+	colorWarn    = lipgloss.Color("#e8b854") // dirty, modified
+	colorDanger  = lipgloss.Color("#e06c75") // error, git read failure
+	colorDim     = lipgloss.Color("#5c6166") // stale >30d
+	colorSurface = lipgloss.Color("#242629") // selected row, status bar
 )
 
 // headers is the TUI header row, derived from render.Columns (the single
 // source of truth for column set/order/labels), not an independent list.
 var headers = render.TUIHeaders()
 
-// styleCell colors a single plane cell value per the spec cues.
-func styleCell(col int, val string, p *project.Project) string {
+// styleCell colors a single plane cell value per the spec cues. sel adds the
+// selection background + bold to the cell itself, so the per-cell ANSI reset
+// cannot clear an outer Background style.
+func styleCell(col int, val string, p *project.Project, sel bool) string {
 	var style lipgloss.Style
 	switch col {
 	case render.ColName: // Name
-		style = lipgloss.NewStyle().Foreground(colorNormal)
+		style = lipgloss.NewStyle().Foreground(colorFg)
 		if p.Err != nil {
-			style = lipgloss.NewStyle().Foreground(colorDirty)
+			style = lipgloss.NewStyle().Foreground(colorDanger)
 		}
 	case render.ColTags: // Tags
 		style = lipgloss.NewStyle().Foreground(colorAccent)
@@ -365,10 +371,12 @@ func styleCell(col int, val string, p *project.Project) string {
 		}
 	case render.ColGit: // Git
 		switch {
-		case val == "!" || strings.HasPrefix(val, "●"):
-			style = lipgloss.NewStyle().Foreground(colorDirty)
+		case val == "!":
+			style = lipgloss.NewStyle().Foreground(colorDanger)
+		case strings.HasPrefix(val, "●"):
+			style = lipgloss.NewStyle().Foreground(colorWarn)
 		case val == "✓":
-			style = lipgloss.NewStyle().Foreground(colorClean)
+			style = lipgloss.NewStyle().Foreground(colorAccent)
 		default: // "—"
 			style = lipgloss.NewStyle().Foreground(colorMuted)
 		}
@@ -383,21 +391,24 @@ func styleCell(col int, val string, p *project.Project) string {
 		case val == "—":
 			style = lipgloss.NewStyle().Foreground(colorMuted)
 		case val == "✓":
-			style = lipgloss.NewStyle().Foreground(colorClean)
+			style = lipgloss.NewStyle().Foreground(colorAccent)
 		default: // ↑N / ↓N
 			style = lipgloss.NewStyle().Foreground(colorAccent)
 		}
 	case render.ColTODO: // TODO
 		if p.TODO && p.TODOOpen > 0 {
-			style = lipgloss.NewStyle().Foreground(colorNormal)
+			style = lipgloss.NewStyle().Foreground(colorFg)
 		} else {
 			style = lipgloss.NewStyle().Foreground(colorMuted)
 		}
 	case render.ColLastActive: // LastActive
-		style = lipgloss.NewStyle().Foreground(colorNormal)
+		style = lipgloss.NewStyle().Foreground(colorFg)
 		if val == "—" {
 			style = lipgloss.NewStyle().Foreground(colorMuted)
 		}
+	}
+	if sel {
+		style = style.Bold(true).Background(colorSurface)
 	}
 	return style.Render(val)
 }
@@ -475,14 +486,14 @@ func (m *model) renderTitle() string {
 	left := lipgloss.NewStyle().Bold(true).Foreground(colorAccent).
 		Render("prv") + lipgloss.NewStyle().Foreground(colorMuted).
 		Render(" "+trimRoot(m.root))
-	titleLine := lipgloss.JoinHorizontal(lipgloss.Left, left, strings.Repeat(" ", max(1, m.width-lipgloss.Width(left)-lipgloss.Width(sortLabel))), lipgloss.NewStyle().Foreground(colorMuted).Render(sortLabel))
+	titleLine := lipgloss.JoinHorizontal(lipgloss.Top, left, strings.Repeat(" ", max(1, m.width-lipgloss.Width(left)-lipgloss.Width(sortLabel))), lipgloss.NewStyle().Foreground(colorMuted).Render(sortLabel))
 
 	status := m.status
 	if m.fetching {
 		status = spinnerFrames[m.spinner] + " " + status
 	}
 	statusLine := lipgloss.NewStyle().Foreground(colorMuted).Render(status)
-	return lipgloss.JoinVertical(lipgloss.Left, titleLine, statusLine)
+	return lipgloss.JoinVertical(lipgloss.Top, titleLine, statusLine)
 }
 
 func (m *model) renderTable(avail int) string {
@@ -545,24 +556,43 @@ func (m *model) renderTable(avail int) string {
 	for vi := start; vi < end; vi++ {
 		r := all[vi]
 		isSel := vi == m.selected
-		// build colored cells, padded to column width using the plain width.
+		isStale := stale(r.p)
+		// Build cells padded to column width using the plain width. Stale rows
+		// render plain cells: the row-level colorDim style must cover the whole
+		// line, and an inner per-cell ANSI reset would clear it. Selected
+		// non-stale rows keep per-cell colors but paint the surface background
+		// onto every cell, pad, and gap — otherwise the per-cell resets punch
+		// holes in the highlight (only the first cell used to show it).
 		cells := make([]string, len(headers))
 		for c := range headers {
 			plain := r.cel[c]
-			rendered := styleCell(c, plain, r.p)
 			pad := widths[c] - lipgloss.Width(plain)
 			if pad < 0 {
 				pad = 0
 			}
-			cells[c] = rendered + strings.Repeat(" ", pad)
+			switch {
+			case isStale:
+				cells[c] = plain + strings.Repeat(" ", pad)
+			case isSel:
+				bgPad := lipgloss.NewStyle().Background(colorSurface).Render(strings.Repeat(" ", pad))
+				cells[c] = styleCell(c, plain, r.p, true) + bgPad
+			default:
+				cells[c] = styleCell(c, plain, r.p, false) + strings.Repeat(" ", pad)
+			}
 		}
 		line := strings.Join(cells, render.ColGap)
-		if stale(r.p) {
-			line = lipgloss.NewStyle().Faint(true).Render(line)
-		}
-		if isSel {
-			line = lipgloss.NewStyle().Bold(true).Background(colorBar).Foreground(colorAccent).Render(" " + line)
-		} else {
+		switch {
+		case isStale:
+			line = lipgloss.NewStyle().Foreground(colorDim).Render(line)
+			if isSel {
+				line = lipgloss.NewStyle().Bold(true).Background(colorSurface).Foreground(colorAccent).Render(" " + line)
+			} else {
+				line = "  " + line
+			}
+		case isSel:
+			gap := lipgloss.NewStyle().Background(colorSurface).Render(render.ColGap)
+			line = lipgloss.NewStyle().Background(colorSurface).Render(" " + strings.Join(cells, gap))
+		default:
 			line = "  " + line
 		}
 		b.WriteString(line)
@@ -626,7 +656,7 @@ func (m *model) renderHelp() string {
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(colorAccent).
 		Padding(1, 2).
-		Foreground(colorNormal).
+		Foreground(colorFg).
 		Render(body)
 	return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, box)
 }

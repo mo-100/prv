@@ -1,7 +1,7 @@
 // Package scan classifies a directory tree into rows and fills each row's
 // Project record, returning a slice both frontends render from.
 //
-// Two phases per docs/project.md §Scanner:
+// Two phases:
 //  1. Classify (cheap, serial): os.ReadDir(root) → per child a signal check
 //     (file-existence only). A signal-less child gets one deeper ReadDir to
 //     test the container rule. Hard cap Config.Depth (default 4).

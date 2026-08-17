@@ -1,6 +1,6 @@
 // Package project defines the shared Project record and the cheap per-folder
 // classifier used by the scanner. This is the contract every engine package
-// builds against; see docs/project.md for the locked spec.
+// builds against; the field set is a locked spec.
 package project
 
 import (
@@ -22,8 +22,8 @@ const (
 )
 
 // Project is the shared record the scanner fills and both frontends render.
-// Field semantics mirror docs/project.md exactly; do not add rendered
-// dimensions without updating the spec first.
+// Field semantics are the locked spec; do not add rendered dimensions without
+// updating the spec first.
 type Project struct {
 	Name       string // path relative to scan root ("my-app", "work/my-app")
 	Path       string // absolute path to the project directory
